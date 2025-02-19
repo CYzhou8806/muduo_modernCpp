@@ -21,11 +21,11 @@ namespace muduoModernCpp
      * Initializes a new thread with the given function, name, and destruction behavior.
      * The thread is not started immediately after construction.
      * 
-     * @param func The function to be executed in the thread
-     * @param name The name of the thread (defaults to "Thread")
-     * @param joinOnDestroy Whether to join or detach the thread in destructor (defaults to true)
+     * @param inFunc The function to be executed in the thread
+     * @param inName The name of the thread (defaults to "Thread")
+     * @param inJoinOnDestroy Whether to join or detach the thread in destructor (defaults to true)
      */
-   explicit Thread(ThreadFunc func, const std::string& name = std::string("Thread"), bool joinOnDestroy = true); // prevent implicit conversion
+   explicit Thread(ThreadFunc inFunc, const std::string& inName = std::string("Thread"), bool inJoinOnDestroy = true); // prevent implicit conversion
    
    /**
      * @brief Destructor for the Thread class
