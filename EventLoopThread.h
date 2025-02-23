@@ -45,13 +45,13 @@ public:
      * Uses mutex and condition variable for synchronization to ensure
      * the event loop is fully initialized before returning.
      * 
-     * @return EventLoop* Pointer to the created event loop
+     * @return EventLoop* Pointer to the created event loop as observer
      */
     EventLoop* startLoop();
 
 private:
     /**
-     * @brief Thread execution function
+     * @brief The function that is executed in the thread
      * 
      * Creates an event loop for the thread and runs it.
      * Executes the initialization callback if provided.
@@ -62,9 +62,9 @@ private:
     EventLoop *m_loop;           // Pointer to the event loop owned by this thread
     bool m_exiting;             // Flag indicating whether the thread is exiting
     muduoModernCpp::Thread m_thread;            // The underlying thread object
-    std::mutex m_mutex;         // Mutex for thread synchronization
-    std::condition_variable m_cond;  // Condition variable for thread synchronization
-    ThreadInitCallback m_callback;    // Callback function for thread initialization
+    std::mutex m_mutex;
+    std::condition_variable m_cond;
+    ThreadInitCallback m_callback;
 };
 
 } // namespace muduoModernCpp

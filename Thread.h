@@ -42,7 +42,7 @@ namespace muduoModernCpp
    ~Thread();
    
   /**
-    * @brief Starts the thread execution
+    * @brief Starts the thread execution (main logic of the thread)
     * 
     * Creates and starts the thread with the function provided in the constructor.
     * Uses a semaphore for synchronization to ensure the thread is fully initialized
@@ -97,8 +97,6 @@ namespace muduoModernCpp
    static int32_t numCreated() { return s_numCreated; } 
 
  private:
-   void runInThread();
-
    /**
     * @brief Sets a default name for the thread if none was provided
     * 
@@ -109,7 +107,7 @@ namespace muduoModernCpp
    void setDefaultName();
 
  private:
-   ThreadFunc m_func;
+   ThreadFunc m_func; // The function to be executed in the thread (main logic)
 
    bool m_started;
    bool m_joined;
@@ -118,7 +116,7 @@ namespace muduoModernCpp
    pid_t m_tid;
    static std::atomic<int32_t> s_numCreated;
 
-   std::shared_ptr<std::thread> m_threadPtr;
+   std::shared_ptr<std::thread> m_threadPtr; // pointer to the new created thread // todo maybe use unique_ptr ?!?!
  };
 
 }  // namespace muduoModernCpp

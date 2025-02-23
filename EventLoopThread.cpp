@@ -57,6 +57,9 @@ void EventLoopThread::threadFunc()
     }
 
     loop.loop(); // block in the EventLoop loop  => Poller.poll
+
+    // after m_quit in loop set as true, exit the while loop from loop.loop() 
+    // process will come to here and destroy the above EventLoop object
     std::unique_lock<std::mutex> lock(m_mutex);
     m_loop = nullptr;
 }
