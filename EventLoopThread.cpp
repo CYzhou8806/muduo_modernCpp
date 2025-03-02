@@ -36,6 +36,8 @@ EventLoop* EventLoopThread::startLoop()
         {
             m_cond.wait(lock);
         }
+
+        // here, the loop object from EventLoopThread::threadFunc() is ready
         loop = m_loop; // use raw pointer as observer
     }
     return loop;

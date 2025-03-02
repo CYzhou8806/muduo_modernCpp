@@ -46,7 +46,7 @@ public:
      * Creates and starts the specified number of EventLoopThread objects.
      * Each thread will run its own EventLoop.
      * 
-     * @param inCallback Optional callback to initialize each EventLoop
+     * @param inCallback the threadFunc that will be executed in the new threads
      */
     void start(const EventLoopThread::ThreadInitCallback &inCallback = EventLoopThread::ThreadInitCallback());
 
