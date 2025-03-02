@@ -1,7 +1,5 @@
 #pragma once
 
-namespace muduoModernCpp
-{
 
 class noncopyable
 {
@@ -14,4 +12,3 @@ class noncopyable
   ~noncopyable() = default;
 };
 
-}

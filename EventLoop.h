@@ -1,14 +1,17 @@
 #pragma once
 
-#include <functional>
-#include <vector>
-#include <atomic>
-#include <memory>
-#include <mutex>
-#include <syscall.h>
-
 #include "noncopyable.h"
 #include "Timestamp.h"
+#include "Channel.h"
+#include "Poller.h"
+
+#include <functional>
+#include <memory>
+#include <vector>
+#include <atomic>
+#include <mutex>
+#include <unistd.h>     // for syscall
+#include <sys/syscall.h> // for SYS_gettid
 
 /**
  * @brief Event Loop class for handling I/O events

@@ -9,9 +9,9 @@ Poller::Poller(EventLoop *inLoop)
 {
 }
 
-bool Poller::hasChannel(Channel *inChannel) const
+bool Poller::hasChannel(const Channel *inChannel) const
 {
-    auto it = m_channels.find(inChannel->fd());
+    auto it = m_channels.find(inChannel->getFd());
     return it != m_channels.end() && it->second == inChannel;
 }
 

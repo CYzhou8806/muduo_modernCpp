@@ -10,8 +10,7 @@
 
 class EventLoop;
 
-namespace muduoModernCpp
-{
+
 class EventLoopThread : noncopyable
 {
 public:
@@ -67,4 +66,3 @@ private:
     ThreadInitCallback m_callback;
 };
 
-} // namespace muduoModernCpp

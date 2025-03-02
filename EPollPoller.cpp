@@ -4,7 +4,7 @@
 
 #include <errno.h>
 #include <unistd.h>
-#include <strings.h>
+#include <string.h>
 
 // Channel status constants
 const int kStatusNew = -1;     // Channel not added to poller
@@ -27,20 +27,19 @@ EPollPoller::~EPollPoller()
     ::close(m_epollfd);
 }
 
-void EPollPoller::update(int inOperation, Channel *inChannel)
+void EPollPoller::update(int operation, Channel *inChannel)
 {
     epoll_event event;
-    bzero(&event, sizeof event);
+    memset(&event, 0, sizeof(event));
     
-    int fd = inChannel->fd();
-
-    event.events = inChannel->events();
-    event.data.fd = fd; 
+    int fd = inChannel->getFd();
+    event.events = inChannel->getEvents();
+    event.data.fd = fd;
     event.data.ptr = inChannel;
     
-    if (::epoll_ctl(m_epollfd, inOperation, fd, &event) < 0)
+    if (::epoll_ctl(m_epollfd, operation, fd, &event) < 0)
     {
-        if (inOperation == EPOLL_CTL_DEL)
+        if (operation == EPOLL_CTL_DEL)
         {
             LOG_ERROR("epoll_ctl del error:%d\n", errno);
         }
@@ -64,7 +63,7 @@ Timestamp EPollPoller::poll(int inTimeoutMs, ChannelList *outActiveChannels)
     {
         LOG_INFO("%d events happened \n", numEvents);
         fillActiveChannels(numEvents, outActiveChannels);
-        if (numEvents == m_events.size())
+        if (static_cast<size_t>(numEvents) == m_events.size())
         {
             m_events.resize(m_events.size() * 2);
         }
@@ -91,13 +90,13 @@ Timestamp EPollPoller::poll(int inTimeoutMs, ChannelList *outActiveChannels)
 void EPollPoller::updateChannel(Channel *inOutChannel)
 {
     const int status = inOutChannel->getChannelStatus();
-    LOG_INFO("func=%s => fd=%d events=%d status=%d \n", __func__, inOutChannel->fd(), inOutChannel->events(), status);
+    LOG_INFO("func=%s => fd=%d events=%d status=%d \n", __func__, inOutChannel->getFd(), inOutChannel->getEvents(), status);
 
     if (status == kStatusNew || status == kStatusDeleted)
     {
         if (status == kStatusNew)
         {
-            int fd = inOutChannel->fd();
+            int fd = inOutChannel->getFd();
             m_channels[fd] = inOutChannel;
         }
 
@@ -106,11 +105,12 @@ void EPollPoller::updateChannel(Channel *inOutChannel)
     }
     else  // Channel is already registered in epoll
     {
-        int fd = inOutChannel->fd();
         if (inOutChannel->isNoneEvent())  // Check if the channel is not interested in any events
         {
+            int fd = inOutChannel->getFd();
             update(EPOLL_CTL_DEL, inOutChannel);
             inOutChannel->setChannelStatus(kStatusDeleted);
+            m_channels.erase(fd);
         }
         else
         {
@@ -121,7 +121,7 @@ void EPollPoller::updateChannel(Channel *inOutChannel)
 
 void EPollPoller::removeChannel(Channel *inOutChannel) 
 {
-    int fd = inOutChannel->fd();
+    int fd = inOutChannel->getFd();
     m_channels.erase(fd);
 
     LOG_INFO("func=%s => fd=%d\n", __func__, fd);
@@ -134,12 +134,12 @@ void EPollPoller::removeChannel(Channel *inOutChannel)
     inOutChannel->setChannelStatus(kStatusNew);
 }
 
-void EPollPoller::fillActiveChannels(int inNumEvents, ChannelList *outActiveChannels) const
+void EPollPoller::fillActiveChannels(int numEvents, ChannelList *outActiveChannels) const
 {
-    for (int i=0; i < inNumEvents; ++i)
+    for (int i = 0; i < numEvents; ++i)
     {
         Channel *channel = static_cast<Channel*>(m_events[i].data.ptr);
-        channel->set_revents(m_events[i].events);
+        channel->setRevents(m_events[i].events);
         outActiveChannels->push_back(channel);
     }
 }

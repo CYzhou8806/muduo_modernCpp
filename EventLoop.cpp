@@ -37,11 +37,11 @@ static int createEventfd()
 EventLoop::EventLoop()
     : m_looping(false)
     , m_quit(false)
-    , m_callingPendingFunctors(false)
     , m_threadId(::syscall(SYS_gettid))
     , m_poller(Poller::newDefaultPoller(this))
     , m_wakeupFd(createEventfd())
     , m_wakeupChannel(new Channel(this, m_wakeupFd))
+    , m_callingPendingFunctors(false)
 {
     LOG_DEBUG("EventLoop created %p in thread %d \n", this, m_threadId);
     if (t_loopInThisThread)

@@ -2,9 +2,8 @@
 #include "EventLoop.h"
 #include <syscall.h>
 
-namespace muduoModernCpp
-{       
-EventLoopThread::EventLoopThread(const ThreadInitCallback &inCallback, 
+
+EventLoopThread::EventLoopThread(const ThreadInitCallback &inCallback,
         const std::string &inName)
         : m_loop(nullptr)
         , m_exiting(false)
@@ -66,4 +65,3 @@ void EventLoopThread::threadFunc()
     m_loop = nullptr;
 }
 
-} // namespace muduoModernCpp

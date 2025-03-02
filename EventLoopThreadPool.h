@@ -1,13 +1,12 @@
 #pragma once
+#include "EventLoop.h"
+#include "EventLoopThread.h"
 #include "noncopyable.h"
 
 #include <functional>
 #include <string>
 #include <vector>
 #include <memory>
-
-class EventLoop;
-class EventLoopThread;
 
 /**
  * @brief A thread pool that manages multiple EventLoop threads
@@ -84,7 +83,7 @@ private:
     std::string m_name;         // Name of the thread pool
     bool m_started;             // Flag indicating if the pool has been started
     int m_numThreads;           // Number of sub-threads in the pool
-    int m_next;                 // Index for round-robin selection of EventLoops
+    size_t m_next;              // Index for round-robin selection of EventLoops
     
     // Using unique_ptr for automatic resource management of threads
     std::vector<std::unique_ptr<EventLoopThread>> m_threads;
