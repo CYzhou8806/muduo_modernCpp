@@ -26,10 +26,11 @@ Socket::~Socket()
 
 void Socket::bindAddress(const InetAddress &inLocaladdr)
 {
-    if (::bind(m_sockfd, static_cast<const sockaddr*>(inLocaladdr.getSockAddr()), 
+    if (::bind(m_sockfd, 
+               reinterpret_cast<const sockaddr*>(inLocaladdr.getSockAddr()), 
                sizeof(sockaddr_in)) != 0)
     {
-        LOG_FATAL(std::format("bind sockfd:{} fail", m_sockfd));
+        LOG_FATAL("bind sockfd:%d fail", m_sockfd);
     }
 }
 
@@ -37,7 +38,7 @@ void Socket::listen()
 {
     if (::listen(m_sockfd, kMaxListenQueueSize) != 0)
     {
-        LOG_FATAL(std::format("listen sockfd:{} fail", m_sockfd));
+        LOG_FATAL("listen sockfd:%d fail", m_sockfd);
     }
 }
 
@@ -64,22 +65,22 @@ void Socket::shutdownWrite()
     }
 }
 
-void Socket::setTcpNoDelay(bool on)
+void Socket::setTcpNoDelay(bool inOn)
 {
-    setSocketOption(m_sockfd, IPPROTO_TCP, TCP_NODELAY, on);
+    setSocketOption(m_sockfd, IPPROTO_TCP, TCP_NODELAY, inOn);
 }
 
-void Socket::setReuseAddr(bool on)
+void Socket::setReuseAddr(bool inOn)
 {
-    setSocketOption(m_sockfd, SOL_SOCKET, SO_REUSEADDR, on);
+    setSocketOption(m_sockfd, SOL_SOCKET, SO_REUSEADDR, inOn);
 }
 
-void Socket::setReusePort(bool on)
+void Socket::setReusePort(bool inOn)
 {
-    setSocketOption(m_sockfd, SOL_SOCKET, SO_REUSEPORT, on);
+    setSocketOption(m_sockfd, SOL_SOCKET, SO_REUSEPORT, inOn);
 }
 
-void Socket::setKeepAlive(bool on)
+void Socket::setKeepAlive(bool inOn)
 {
-    setSocketOption(m_sockfd, SOL_SOCKET, SO_KEEPALIVE, on);
+    setSocketOption(m_sockfd, SOL_SOCKET, SO_KEEPALIVE, inOn);
 }
