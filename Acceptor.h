@@ -27,7 +27,7 @@ public:
      */
     Acceptor(EventLoop *inLoop, const InetAddress &inListenAddr, bool inReusePort);
     ~Acceptor();
-
+    
     /**
      * @brief Sets the callback function for handling new connections
      * @param inCallback The callback function to be called when new connection arrives
