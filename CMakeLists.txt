@@ -32,6 +32,9 @@ set(SOURCES
         Socket.cpp
         InetAddress.cpp
         Acceptor.cpp
+        TcpConnection.cpp
+        TcpServer.cpp
+        Buffer.cpp
 )
 
 # Build shared library
