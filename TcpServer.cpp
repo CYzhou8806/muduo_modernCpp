@@ -2,7 +2,7 @@
 #include "Logger.h"
 #include "TcpConnection.h"
 
-#include <format>
+#include <string>
 #include <functional>
 
 namespace {
@@ -17,13 +17,13 @@ namespace {
 }  // namespace
 
 TcpServer::TcpServer(EventLoop *inLoop,
-                     InetAddress inListenAddr,
-                     std::string inNameArg,
+                     const InetAddress &inListenAddr,
+                     std::string inName,
                      Option inOption)
     : m_loop(CheckLoopNotNull(inLoop))
     , m_ipPort(inListenAddr.toIpPort())
-    , m_name(std::move(inNameArg))
-    , m_acceptor(std::make_unique<Acceptor>(inLoop, std::move(inListenAddr), inOption == Option::ReusePort))
+    , m_name(std::move(inName))
+    , m_acceptor(std::make_unique<Acceptor>(inLoop, inListenAddr, inOption == Option::ReusePort))
     , m_threadPool(std::make_unique<EventLoopThreadPool>(inLoop, m_name))
     , m_nextConnId(1)
     , m_started(0)
@@ -44,7 +44,7 @@ void TcpServer::setThreadNum(int inNumThreads)
 
 void TcpServer::start()
 {
-    if (m_started++ == 0)  // Prevent multiple starts
+    if (!m_started.exchange(true))  // Prevent multiple starts
     {
         m_threadPool->start(m_threadInitCallback);
         m_loop->runInLoop([acceptor = m_acceptor.get()]() { acceptor->listen(); });
@@ -57,7 +57,7 @@ void TcpServer::newConnection(int inSockfd, const InetAddress &inPeerAddr)
     EventLoop *ioLoop = m_threadPool->getNextLoop();
     
     // Create connection name
-    std::string connName = std::format("{}-{}#{}", m_name, m_ipPort, m_nextConnId++);
+    std::string connName = m_name + "-" + m_ipPort + "#" + std::to_string(m_nextConnId++);
 
     LOG_INFO("TcpServer::newConnection [{}] - new connection [{}] from {}\n",
              m_name, connName, inPeerAddr.toIpPort());
@@ -81,7 +81,7 @@ void TcpServer::newConnection(int inSockfd, const InetAddress &inPeerAddr)
     );
 
     // Store connection
-    m_connections[conn->name()] = conn;
+    m_connections[conn->getName()] = conn;
 
     // Set callbacks
     conn->setConnectionCallback(m_connectionCallback)
@@ -107,9 +107,9 @@ void TcpServer::removeConnection(const TcpConnectionPtr &inConn)
 void TcpServer::removeConnectionInLoop(const TcpConnectionPtr &inConn)
 {
     LOG_INFO("TcpServer::removeConnectionInLoop [{}] - connection {}\n",
-             m_name, inConn->name());
+             m_name, inConn->getName());
 
-    m_connections.erase(inConn->name());
+    m_connections.erase(inConn->getName());
     EventLoop *ioLoop = inConn->getLoop();
     
     ioLoop->queueInLoop([conn = inConn]() {
